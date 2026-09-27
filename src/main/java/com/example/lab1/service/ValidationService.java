@@ -1,7 +1,7 @@
 package com.example.lab1.service;
 
-import com.example.lab1.model.Request;
+import org.springframework.validation.BindingResult;
 
 public interface ValidationService {
-    void validate(Request request);
+    void validate(BindingResult bindingResult);
 }

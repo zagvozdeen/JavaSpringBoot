@@ -16,7 +16,7 @@ public class Request {
     @Size(max = 32)
     private String operationUid;
 
-    private String systemName;
+    private Systems systemName;
 
     @NotBlank
     private String systemTime;

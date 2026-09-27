@@ -1,0 +1,22 @@
+### 01. Генерация operationUid
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemName": "ERP",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Генерация operationUid", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid !== "operation-1", "operationUid не обновлён");
+    client.assert(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(response.body.operationUid), "Ожидался UUID v4");
+});
+%}

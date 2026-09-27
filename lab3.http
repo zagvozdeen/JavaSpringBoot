@@ -1,0 +1,158 @@
+### 01. Система ERP
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemName": "ERP",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Система ERP", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+    client.assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(response.body.systemTime), "Ожидалось время UTC с миллисекундами");
+    client.assert(response.body.systemTime !== "2026-09-27T10:00:00.000Z", "systemTime не обновлено");
+});
+%}
+
+### 02. Система CRM
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemName": "CRM",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Система CRM", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+    client.assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(response.body.systemTime), "Ожидалось время UTC с миллисекундами");
+    client.assert(response.body.systemTime !== "2026-09-27T10:00:00.000Z", "systemTime не обновлено");
+});
+%}
+
+### 03. Система WMS
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemName": "WMS",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Система WMS", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+    client.assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(response.body.systemTime), "Ожидалось время UTC с миллисекундами");
+    client.assert(response.body.systemTime !== "2026-09-27T10:00:00.000Z", "systemTime не обновлено");
+});
+%}
+
+### 04. Необязательная система не задана
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Необязательная система не задана", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+    client.assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(response.body.systemTime), "Ожидалось время UTC с миллисекундами");
+    client.assert(response.body.systemTime !== "2026-09-27T10:00:00.000Z", "systemTime не обновлено");
+});
+%}
+
+### 05. Пустой uid
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "",
+  "operationUid": "operation-1",
+  "systemName": "ERP",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Пустой uid", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+    client.assert(response.body.uid === "", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+});
+%}
+
+### 06. Неподдерживаемый uid = 123
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "123",
+  "operationUid": "operation-1",
+  "systemName": "ERP",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Неподдерживаемый uid = 123", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "UnsupportedCodeException", "Неверный errorCode");
+    client.assert(response.body.uid === "123", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+});
+%}
+
+### 07. Неизвестная система
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemName": "UNKNOWN",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Неизвестная система", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}

@@ -1,5 +1,6 @@
 package com.example.lab1.controller;
 
+import com.example.lab1.service.ModifySystemTimeResponseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,7 +35,7 @@ class MyControllerTest {
 
     @Test
     void returnsSuccessWithCopiedIdentifiersAndCurrentUtcTime() throws Exception {
-        Instant before = Instant.now();
+        Instant before = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         String body = send(validRequest()
                 .put("systemName", "ERP")
                 .put("source", "mobile")
@@ -133,7 +135,7 @@ class MyControllerTest {
     void returnsServerErrorWithoutLeakingUnexpectedExceptionDetails() throws Exception {
         MockMvc failingServiceMvc = MockMvcBuilders.standaloneSetup(new MyController(request -> {
             throw new IllegalStateException("Internal details");
-        })).build();
+        }, new ModifySystemTimeResponseService())).build();
 
         failingServiceMvc.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)

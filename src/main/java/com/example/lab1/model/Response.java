@@ -1,15 +1,15 @@
 package com.example.lab1.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @AllArgsConstructor
 public class Response {
-    private final String uid;
-    private final String operationUid;
-    private final String systemTime;
-    private final String code;
-    private final String errorCode;
-    private final String errorMessage;
+    private String uid;
+    private String operationUid;
+    private String systemTime;
+    private Codes code;
+    private ErrorCodes errorCode;
+    private ErrorMessages errorMessage;
 }
