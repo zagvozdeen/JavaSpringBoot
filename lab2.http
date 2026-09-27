@@ -1,0 +1,506 @@
+### 01. Все поля
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemName": "ERP",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "source": "IDEA",
+  "communicationId": 100,
+  "templateId": 8,
+  "productCode": 1500,
+  "smsCode": 10
+}
+
+> {%
+client.test("Все поля", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+});
+%}
+
+### 02. Только обязательные поля
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Только обязательные поля", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+});
+%}
+
+### 03. uid отсутствует
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("uid отсутствует", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 04. uid: null
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": null,
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("uid: null", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 05. uid: пустой
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("uid: пустой", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 06. uid: из пробелов
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "   ",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("uid: из пробелов", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 07. uid: 32 символа
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("uid: 32 символа", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+});
+%}
+
+### 08. uid: 33 символа
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("uid: 33 символа", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 09. operationUid отсутствует
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("operationUid отсутствует", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 10. operationUid: null
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": null,
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("operationUid: null", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 11. operationUid: пустой
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("operationUid: пустой", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 12. operationUid: из пробелов
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "   ",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("operationUid: из пробелов", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 13. operationUid: 32 символа
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("operationUid: 32 символа", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Неверный operationUid");
+});
+%}
+
+### 14. operationUid: 33 символа
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("operationUid: 33 символа", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 15. systemTime отсутствует
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "communicationId": 100
+}
+
+> {%
+client.test("systemTime отсутствует", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 16. systemTime: null
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": null,
+  "communicationId": 100
+}
+
+> {%
+client.test("systemTime: null", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 17. systemTime: пустой
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "",
+  "communicationId": 100
+}
+
+> {%
+client.test("systemTime: пустой", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 18. systemTime: из пробелов
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "   ",
+  "communicationId": 100
+}
+
+> {%
+client.test("systemTime: из пробелов", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 19. communicationId = 1
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 1
+}
+
+> {%
+client.test("communicationId = 1", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+});
+%}
+
+### 20. communicationId = 100000
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100000
+}
+
+> {%
+client.test("communicationId = 100000", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.uid === "1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-1", "Неверный operationUid");
+});
+%}
+
+### 21. communicationId = 0
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 0
+}
+
+> {%
+client.test("communicationId = 0", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 22. communicationId = 100001
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100001
+}
+
+> {%
+client.test("communicationId = 100001", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 23. communicationId = null
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": null
+}
+
+> {%
+client.test("communicationId = null", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 24. communicationId отсутствует
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "1",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z"
+}
+
+> {%
+client.test("communicationId отсутствует", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
+
+### 25. Неподдерживаемый uid = 123
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "123",
+  "operationUid": "operation-1",
+  "systemTime": "2026-09-27T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Неподдерживаемый uid = 123", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "UnsupportedCodeException", "Неверный errorCode");
+});
+%}
+
+### 26. Несколько ошибок одновременно
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "",
+  "operationUid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "systemTime": "   ",
+  "communicationId": 0
+}
+
+> {%
+client.test("Несколько ошибок одновременно", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+});
+%}
