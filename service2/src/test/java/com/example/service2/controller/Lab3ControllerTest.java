@@ -1,12 +1,11 @@
-package com.example.lab1.controller;
+package com.example.service2.controller;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.example.lab1.service.ModifyOperationUidResponseService;
-import com.example.lab1.service.Service2Client;
-import com.example.lab1.service.ValidationServiceImpl;
+import com.example.service2.service.ModifyOperationUidResponseService;
+import com.example.service2.service.ValidationServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.AfterEach;
@@ -20,11 +19,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.UUID;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,10 +40,7 @@ class Lab3ControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
-    private Service2Client service2Client;
-
-    private final Logger logger = (Logger) LoggerFactory.getLogger("com.example.lab1");
+    private final Logger logger = (Logger) LoggerFactory.getLogger("com.example.service2");
     private ListAppender<ILoggingEvent> logs;
 
     @BeforeEach
@@ -144,7 +138,7 @@ class Lab3ControllerTest {
     @Test
     void operationUidServiceCanReplaceTheSelectedTimeService() throws Exception {
         MockMvc alternate = MockMvcBuilders.standaloneSetup(new MyController(
-                new ValidationServiceImpl(), new ModifyOperationUidResponseService(), List.of(), service2Client)).build();
+                new ValidationServiceImpl(), new ModifyOperationUidResponseService())).build();
 
         String body = alternate.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -165,7 +159,7 @@ class Lab3ControllerTest {
         MockMvc failing = MockMvcBuilders.standaloneSetup(new MyController(
                 new ValidationServiceImpl(), response -> {
                     throw new IllegalStateException("Service unavailable");
-                }, List.of(), service2Client)).build();
+                })).build();
 
         failing.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)

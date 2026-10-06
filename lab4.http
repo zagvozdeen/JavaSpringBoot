@@ -1,0 +1,114 @@
+### 01. Передача из сервиса 1 в сервис 2
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "lab4-1",
+  "operationUid": "operation-4",
+  "systemName": "ERP",
+  "systemTime": "2026-10-06T10:00:00.000Z",
+  "source": "idea",
+  "communicationId": 100
+}
+
+> {%
+client.test("Передача запроса", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.uid === "lab4-1", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-4", "Неверный operationUid");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+    client.assert(response.body.errorMessage === "", "Неверный errorMessage");
+    client.assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(response.body.systemTime), "Ожидалось время UTC");
+});
+%}
+
+### 02. Прямой запрос в сервис 2
+# @no-log
+POST http://localhost:8084/feedback
+Content-Type: application/json
+
+{
+  "uid": "lab4-direct",
+  "operationUid": "operation-4",
+  "systemName": "Service 1",
+  "systemTime": "2026-10-06T10:00:00.000Z",
+  "source": "service-1",
+  "communicationId": 100
+}
+
+> {%
+client.test("Сервис 2 доступен напрямую", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.uid === "lab4-direct", "Неверный uid");
+    client.assert(response.body.operationUid === "operation-4", "Неверный operationUid");
+    client.assert(response.body.errorCode === "", "Неверный errorCode");
+});
+%}
+
+### 03. Необязательные поля не заданы
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "lab4-optional",
+  "operationUid": "operation-4",
+  "systemTime": "2026-10-06T10:00:00.000Z",
+  "communicationId": 100
+}
+
+> {%
+client.test("Заполнение необязательных полей", function () {
+    client.assert(response.status === 200, "Ожидался HTTP 200");
+    client.assert(response.body.code === "success", "Неверный code");
+    client.assert(response.body.uid === "lab4-optional", "Неверный uid");
+});
+%}
+
+### 04. Ошибка валидации
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "",
+  "operationUid": "operation-4",
+  "systemName": "ERP",
+  "systemTime": "2026-10-06T10:00:00.000Z",
+  "source": "idea",
+  "communicationId": 100
+}
+
+> {%
+client.test("Пустой uid", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "ValidationException", "Неверный errorCode");
+    client.assert(response.body.errorMessage === "Ошибка валидации", "Неверный errorMessage");
+});
+%}
+
+### 05. Неподдерживаемый uid
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "123",
+  "operationUid": "operation-4",
+  "systemName": "ERP",
+  "systemTime": "2026-10-06T10:00:00.000Z",
+  "source": "idea",
+  "communicationId": 100
+}
+
+> {%
+client.test("Неподдерживаемый uid", function () {
+    client.assert(response.status === 400, "Ожидался HTTP 400");
+    client.assert(response.body.code === "failed", "Неверный code");
+    client.assert(response.body.errorCode === "UnsupportedCodeException", "Неверный errorCode");
+});
+%}

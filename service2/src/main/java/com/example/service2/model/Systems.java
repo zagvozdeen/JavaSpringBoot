@@ -1,4 +1,4 @@
-package com.example.lab1.model;
+package com.example.service2.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -14,4 +14,9 @@ public enum Systems {
     SERVICE_1("Service 1");
 
     private final String description;
+
+    @Override
+    public String toString() {
+        return this == SERVICE_1 ? "Service 1" : name();
+    }
 }

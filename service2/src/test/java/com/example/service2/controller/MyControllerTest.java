@@ -1,7 +1,6 @@
-package com.example.lab1.controller;
+package com.example.service2.controller;
 
-import com.example.lab1.service.ModifySystemTimeResponseService;
-import com.example.lab1.service.Service2Client;
+import com.example.service2.service.ModifySystemTimeResponseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
@@ -13,13 +12,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,9 +32,6 @@ class MyControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockitoBean
-    private Service2Client service2Client;
 
     @Test
     void returnsSuccessWithCopiedIdentifiersAndCurrentUtcTime() throws Exception {
@@ -141,7 +135,7 @@ class MyControllerTest {
     void returnsServerErrorWithoutLeakingUnexpectedExceptionDetails() throws Exception {
         MockMvc failingServiceMvc = MockMvcBuilders.standaloneSetup(new MyController(request -> {
             throw new IllegalStateException("Internal details");
-        }, new ModifySystemTimeResponseService(), List.of(), service2Client)).build();
+        }, new ModifySystemTimeResponseService())).build();
 
         failingServiceMvc.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)
