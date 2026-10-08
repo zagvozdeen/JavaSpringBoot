@@ -78,6 +78,17 @@ class Service2ControllerTest {
     }
 
     @Test
+    void acceptsForwardedBonusFields() throws Exception {
+        mockMvc.perform(post("/feedback")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validRequest().put("position", "TL").put("salary", 100000.0)
+                                .put("bonus", 2.0).put("workDays", 365).toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("success"))
+                .andExpect(jsonPath("$.annualBonus").doesNotExist());
+    }
+
+    @Test
     void acceptsDirectRequestWithoutTimingHeader() throws Exception {
         mockMvc.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)

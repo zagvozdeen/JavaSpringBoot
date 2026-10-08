@@ -2,6 +2,9 @@ package com.example.lab1.controller;
 
 import com.example.lab1.service.ModifySystemTimeResponseService;
 import com.example.lab1.service.Service2Client;
+import com.example.lab1.service.FeedbackService;
+import com.example.lab1.service.AnnualBonusServiceImpl;
+import java.time.Clock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
@@ -139,9 +142,9 @@ class MyControllerTest {
 
     @Test
     void returnsServerErrorWithoutLeakingUnexpectedExceptionDetails() throws Exception {
-        MockMvc failingServiceMvc = MockMvcBuilders.standaloneSetup(new MyController(request -> {
+        MockMvc failingServiceMvc = MockMvcBuilders.standaloneSetup(new MyController(new FeedbackService(request -> {
             throw new IllegalStateException("Internal details");
-        }, new ModifySystemTimeResponseService(), List.of(), service2Client)).build();
+        }, new ModifySystemTimeResponseService(), List.of(), service2Client, new AnnualBonusServiceImpl(Clock.systemUTC())))).build();
 
         failingServiceMvc.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)

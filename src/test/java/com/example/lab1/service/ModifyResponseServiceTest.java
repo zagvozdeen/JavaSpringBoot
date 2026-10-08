@@ -48,7 +48,7 @@ class ModifyResponseServiceTest {
 
     private Response response() {
         return new Response("1", "operation-1", "2000-01-01T00:00:00.000Z",
-                Codes.SUCCESS, ErrorCodes.EMPTY, ErrorMessages.EMPTY);
+                Codes.SUCCESS, ErrorCodes.EMPTY, ErrorMessages.EMPTY, null, null);
     }
 
     private void assertUnchangedOtherFields(Response response) {

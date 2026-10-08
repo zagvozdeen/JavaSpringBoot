@@ -6,6 +6,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.example.lab1.service.ModifyOperationUidResponseService;
 import com.example.lab1.service.Service2Client;
+import com.example.lab1.service.FeedbackService;
+import com.example.lab1.service.AnnualBonusServiceImpl;
+import java.time.Clock;
 import com.example.lab1.service.ValidationServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -143,8 +146,8 @@ class Lab3ControllerTest {
 
     @Test
     void operationUidServiceCanReplaceTheSelectedTimeService() throws Exception {
-        MockMvc alternate = MockMvcBuilders.standaloneSetup(new MyController(
-                new ValidationServiceImpl(), new ModifyOperationUidResponseService(), List.of(), service2Client)).build();
+        MockMvc alternate = MockMvcBuilders.standaloneSetup(new MyController(new FeedbackService(
+                new ValidationServiceImpl(), new ModifyOperationUidResponseService(), List.of(), service2Client, new AnnualBonusServiceImpl(Clock.systemUTC())))).build();
 
         String body = alternate.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -162,10 +165,10 @@ class Lab3ControllerTest {
 
     @Test
     void logsUnexpectedFailuresAtErrorLevel() throws Exception {
-        MockMvc failing = MockMvcBuilders.standaloneSetup(new MyController(
+        MockMvc failing = MockMvcBuilders.standaloneSetup(new MyController(new FeedbackService(
                 new ValidationServiceImpl(), response -> {
                     throw new IllegalStateException("Service unavailable");
-                }, List.of(), service2Client)).build();
+                }, List.of(), service2Client, new AnnualBonusServiceImpl(Clock.systemUTC())))).build();
 
         failing.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)

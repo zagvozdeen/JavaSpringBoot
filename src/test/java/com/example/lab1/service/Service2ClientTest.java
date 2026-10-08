@@ -1,6 +1,7 @@
 package com.example.lab1.service;
 
 import com.example.lab1.model.Request;
+import com.example.lab1.model.Positions;
 import com.example.lab1.model.Systems;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,24 @@ class Service2ClientTest {
                 .andRespond(withSuccess("{\"code\":\"success\"}", MediaType.APPLICATION_JSON));
 
         client.forward(request(), 1791280800000L);
+
+        server.verify();
+    }
+
+    @Test
+    void forwardsBonusFields() {
+        Request request = request();
+        request.setPosition(Positions.TL);
+        request.setSalary(100000.0);
+        request.setBonus(2.0);
+        request.setWorkDays(365);
+        server.expect(once(), requestTo("http://localhost:8084/feedback"))
+                .andExpect(content().json("""
+                        {"position":"TL","salary":100000.0,"bonus":2.0,"workDays":365}
+                        """))
+                .andRespond(withSuccess("{\"code\":\"success\"}", MediaType.APPLICATION_JSON));
+
+        client.forward(request, 1791280800000L);
 
         server.verify();
     }

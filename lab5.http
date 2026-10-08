@@ -1,0 +1,127 @@
+### 01. Премия руководителя TL
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "lab5-1",
+  "operationUid": "operation-5",
+  "systemName": "ERP",
+  "systemTime": "2026-10-08T10:00:00.000Z",
+  "source": "idea",
+  "communicationId": 100,
+  "position": "TL",
+  "salary": 100000.0,
+  "bonus": 2.0,
+  "workDays": 365
+}
+
+> {%
+client.test("Премия руководителя TL", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    const year = new Date().getFullYear();
+    const days = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 366 : 365;
+    const annual = 100000 * 2 * days * 2.6 / 365;
+    client.assert(Math.abs(response.body.annualBonus - annual) < 0.01, "Неверная годовая премия");
+    client.assert(Math.abs(response.body.quarterlyBonus - annual / 4) < 0.01, "Неверная квартальная премия");
+});
+%}
+
+### 02. Премия сотрудника DEV
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "lab5-dev",
+  "operationUid": "operation-5",
+  "systemName": "ERP",
+  "systemTime": "2026-10-08T10:00:00.000Z",
+  "source": "idea",
+  "communicationId": 100,
+  "position": "DEV",
+  "salary": 100000.0,
+  "bonus": 2.0,
+  "workDays": 365
+}
+
+> {%
+client.test("Премия сотрудника DEV", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    const year = new Date().getFullYear();
+    const days = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 366 : 365;
+    const annual = 100000 * 2 * days * 2.2 / 365;
+    client.assert(Math.abs(response.body.annualBonus - annual) < 0.01, "Неверная годовая премия");
+    client.assert(response.body.quarterlyBonus === null, "Квартальная премия только руководителям");
+});
+%}
+
+### 03. Запрос без расчета премии
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "lab5-old",
+  "operationUid": "operation-5",
+  "systemName": "ERP",
+  "systemTime": "2026-10-08T10:00:00.000Z",
+  "source": "idea",
+  "communicationId": 100
+}
+
+> {%
+client.test("Запрос без расчета премии", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.annualBonus === null && response.body.quarterlyBonus === null, "Расчет не запрашивался");
+});
+%}
+
+### 04. Нулевое число рабочих дней
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "lab5-invalid",
+  "operationUid": "operation-5",
+  "systemName": "ERP",
+  "systemTime": "2026-10-08T10:00:00.000Z",
+  "source": "idea",
+  "communicationId": 100,
+  "position": "TL",
+  "salary": 100000.0,
+  "bonus": 2.0,
+  "workDays": 0
+}
+
+> {%
+client.test("Нулевое число рабочих дней", function () {
+    client.assert(response.status === 400, "Неверный HTTP-статус");
+    client.assert(response.body.errorCode === "ValidationException", "Ожидалась ошибка валидации");
+});
+%}
+
+### 05. Не задан множитель bonus
+# @no-log
+POST http://localhost:8082/feedback
+Content-Type: application/json
+
+{
+  "uid": "lab5-missing",
+  "operationUid": "operation-5",
+  "systemName": "ERP",
+  "systemTime": "2026-10-08T10:00:00.000Z",
+  "source": "idea",
+  "communicationId": 100,
+  "position": "TL",
+  "salary": 100000.0,
+  "workDays": 365
+}
+
+> {%
+client.test("Не задан множитель bonus", function () {
+    client.assert(response.status === 400, "Неверный HTTP-статус");
+    client.assert(response.body.errorCode === "ValidationException", "Ожидалась ошибка валидации");
+});
+%}
