@@ -1,0 +1,252 @@
+@baseUrl = http://localhost:8080
+
+### 01. students: Создание записи
+POST {{baseUrl}}/api/students
+Content-Type: application/json
+
+{
+  "name": "Иван",
+  "surname": "Иванов",
+  "faculty": "ИТ",
+  "age": 25
+}
+
+> {%
+if (response.status === 201) client.global.set("studentId", response.body.data.id);
+client.test("01. students: Создание записи", function () {
+    client.assert(response.status === 201, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data.name === "Иван", "Неверное поле name");
+    client.assert(response.body.data.surname === "Иванов", "Неверное поле surname");
+    client.assert(response.body.data.faculty === "ИТ", "Неверное поле faculty");
+    client.assert(response.body.data.age === 25, "Неверное поле age");
+});
+%}
+
+### 02. students: Создание записи для удаления
+POST {{baseUrl}}/api/students
+Content-Type: application/json
+
+{
+  "name": "Иван",
+  "surname": "Иванов",
+  "faculty": "ИТ",
+  "age": 25
+}
+
+> {%
+if (response.status === 201) client.global.set("studentDeleteId", response.body.data.id);
+client.test("02. students: Создание записи для удаления", function () {
+    client.assert(response.status === 201, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data.name === "Иван", "Неверное поле name");
+    client.assert(response.body.data.surname === "Иванов", "Неверное поле surname");
+    client.assert(response.body.data.faculty === "ИТ", "Неверное поле faculty");
+    client.assert(response.body.data.age === 25, "Неверное поле age");
+});
+%}
+
+### 03. students: Все записи
+GET {{baseUrl}}/api/students
+
+> {%
+client.test("03. students: Все записи", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data !== null, "Нет данных");
+});
+%}
+
+### 04. students: Получение по id
+GET {{baseUrl}}/api/students/{{studentId}}
+
+> {%
+client.test("04. students: Получение по id", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data !== null, "Нет данных");
+});
+%}
+
+### 05. students: Изменение записи
+PUT {{baseUrl}}/api/students
+Content-Type: application/json
+
+{
+  "id": {{studentId}},
+  "name": "Иван",
+  "surname": "Иванов",
+  "faculty": "ИТ",
+  "age": 26
+}
+
+> {%
+client.test("05. students: Изменение записи", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data.name === "Иван", "Неверное поле name");
+    client.assert(response.body.data.surname === "Иванов", "Неверное поле surname");
+    client.assert(response.body.data.faculty === "ИТ", "Неверное поле faculty");
+    client.assert(response.body.data.age === 26, "Неверное поле age");
+});
+%}
+
+### 06. students: Удаление записи
+DELETE {{baseUrl}}/api/students/{{studentDeleteId}}
+
+> {%
+client.test("06. students: Удаление записи", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+});
+%}
+
+### 07. students: Поиск удаленной записи
+GET {{baseUrl}}/api/students/{{studentDeleteId}}
+
+> {%
+client.test("07. students: Поиск удаленной записи", function () {
+    client.assert(response.status === 404, "Неверный HTTP-статус");
+    client.assert(response.body.success === false, "Неверный success");
+});
+%}
+
+### 08. students: Ошибка валидации
+POST {{baseUrl}}/api/students
+Content-Type: application/json
+
+{
+  "name": "",
+  "surname": "Иванов",
+  "faculty": "ИТ",
+  "age": 25
+}
+
+> {%
+client.test("08. students: Ошибка валидации", function () {
+    client.assert(response.status === 400, "Неверный HTTP-статус");
+    client.assert(response.body.success === false, "Неверный success");
+});
+%}
+
+### 09. disciplines: Создание записи
+POST {{baseUrl}}/api/disciplines
+Content-Type: application/json
+
+{
+  "name": "Java Spring Boot",
+  "hours": 72,
+  "semester": 2
+}
+
+> {%
+if (response.status === 201) client.global.set("disciplineId", response.body.data.id);
+client.test("09. disciplines: Создание записи", function () {
+    client.assert(response.status === 201, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data.name === "Java Spring Boot", "Неверное поле name");
+    client.assert(response.body.data.hours === 72, "Неверное поле hours");
+    client.assert(response.body.data.semester === 2, "Неверное поле semester");
+});
+%}
+
+### 10. disciplines: Создание записи для удаления
+POST {{baseUrl}}/api/disciplines
+Content-Type: application/json
+
+{
+  "name": "Java Spring Boot",
+  "hours": 72,
+  "semester": 2
+}
+
+> {%
+if (response.status === 201) client.global.set("disciplineDeleteId", response.body.data.id);
+client.test("10. disciplines: Создание записи для удаления", function () {
+    client.assert(response.status === 201, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data.name === "Java Spring Boot", "Неверное поле name");
+    client.assert(response.body.data.hours === 72, "Неверное поле hours");
+    client.assert(response.body.data.semester === 2, "Неверное поле semester");
+});
+%}
+
+### 11. disciplines: Все записи
+GET {{baseUrl}}/api/disciplines
+
+> {%
+client.test("11. disciplines: Все записи", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data !== null, "Нет данных");
+});
+%}
+
+### 12. disciplines: Получение по id
+GET {{baseUrl}}/api/disciplines/{{disciplineId}}
+
+> {%
+client.test("12. disciplines: Получение по id", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data !== null, "Нет данных");
+});
+%}
+
+### 13. disciplines: Изменение записи
+PUT {{baseUrl}}/api/disciplines
+Content-Type: application/json
+
+{
+  "id": {{disciplineId}},
+  "name": "Java Spring Boot",
+  "hours": 108,
+  "semester": 2
+}
+
+> {%
+client.test("13. disciplines: Изменение записи", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+    client.assert(response.body.data.name === "Java Spring Boot", "Неверное поле name");
+    client.assert(response.body.data.hours === 108, "Неверное поле hours");
+    client.assert(response.body.data.semester === 2, "Неверное поле semester");
+});
+%}
+
+### 14. disciplines: Удаление записи
+DELETE {{baseUrl}}/api/disciplines/{{disciplineDeleteId}}
+
+> {%
+client.test("14. disciplines: Удаление записи", function () {
+    client.assert(response.status === 200, "Неверный HTTP-статус");
+    client.assert(response.body.success === true, "Неверный success");
+});
+%}
+
+### 15. disciplines: Поиск удаленной записи
+GET {{baseUrl}}/api/disciplines/{{disciplineDeleteId}}
+
+> {%
+client.test("15. disciplines: Поиск удаленной записи", function () {
+    client.assert(response.status === 404, "Неверный HTTP-статус");
+    client.assert(response.body.success === false, "Неверный success");
+});
+%}
+
+### 16. disciplines: Ошибка валидации
+POST {{baseUrl}}/api/disciplines
+Content-Type: application/json
+
+{
+  "name": "",
+  "hours": 72,
+  "semester": 2
+}
+
+> {%
+client.test("16. disciplines: Ошибка валидации", function () {
+    client.assert(response.status === 400, "Неверный HTTP-статус");
+    client.assert(response.body.success === false, "Неверный success");
+});
+%}
